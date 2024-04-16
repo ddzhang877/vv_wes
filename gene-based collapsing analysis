@@ -27,7 +27,7 @@ step2_SPAtests.R
 --AlleleOrder=ref-first 
 --minMAF=0 
 --minMAC=0.5 
---annotation_in_groupTest="lof,missense:lof,missense:lof:synonymous" 
+--annotation_in_groupTest="lof,missense:lof" 
 --is_output_markerList_in_groupTest=TRUE 
 --LOCO=FALSE 
 --is_fastTest=FALSE 
