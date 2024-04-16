@@ -1,0 +1,47 @@
+# single variant analysis for common variants
+for i in {1..22}; do 
+Rscript step2_SPAtests.R \
+--bedFile=/home1/Huashan1/UKB_WES_data/qcstep5/unrelated_0_0884/ukb_wes_chr${i}_sample_qc_final_unrelated.bed \
+--bimFile=/home1/Huashan1/UKB_WES_data/qcstep5/unrelated_0_0884/ukb_wes_chr${i}_sample_qc_final_unrelated.bim \
+--famFile=/home1/Huashan1/UKB_WES_data/qcstep5/unrelated_0_0884/ukb_wes_chr${i}_sample_qc_final_unrelated.fam \
+--sparseGRMFile=/home1/Huashan1/UKB_WES_data/SAIGE/Huashan1/GRM/UKB_GRM_relatednessCutoff_0.05_5000_randomMarkersUsed_unrelated_2nd_relatednessCutoff_0.05_5000_randomMarkersUsed.sparseGRM.mtx \
+--sparseGRMSampleIDFile=/home1/Huashan1/UKB_WES_data/SAIGE/Huashan1/GRM/UKB_GRM_relatednessCutoff_0.05_5000_randomMarkersUsed_unrelated_2nd_relatednessCutoff_0.05_5000_randomMarkersUsed.sparseGRM.mtx.sampleIDs.txt \
+--AlleleOrder=alt-first \
+--minMAF=0 \
+--minMAC=0.5 \
+--LOCO=FALSE \
+--is_fastTest=TRUE \
+--GMMATmodelFile=/mnt/storage/home1/Huashan1/zdd_data/collapse/vv/vv_s1_chr${i}.rda \
+--varianceRatioFile=/mnt/storage/home1/Huashan1/zdd_data/collapse/vv/vv_s1_chr${i}.varianceRatio.txt \
+--pCutoffforFirth=0.05 \
+--is_Firth_beta=TRUE \
+--is_output_moreDetails=TRUE \
+--SAIGEOutputFile=/mnt/storage/home1/Huashan1/zdd_data/re-saige/vv_common_chr${i}.txt 
+done
+
+#clump#
+for i in ${chr}
+do
+plink --bfile /home1/Huashan1/UKB_WES_data/qcstep5/unrelated_0_0884/ukb_wes_chr${i}_sample_qc_final_unrelated \
+--keep /mnt/storage/home1/Huashan3/hxy_data/wes/RESULTS/common_variants/fam_file/caucasian_fam_id.txt \
+--clump ${path}/com_annovar.tsv \
+--clump-p1 0.05 --clump-r2 0.1 --clump-kb 1000 \
+--clump-field bon --clump-snp-field ID \
+--out ${path}/com_clump/vv_chr${i} &
+done
+
+#COJO##正式运算#循环多染色体#
+for i in $($chr)
+do
+/public/home/xyhe/software/GCTA/gcta-1.94.1-linux-kernel-3-x86_64/gcta-1.94.1 \
+--bfile /public/home2/nodecw_group/UKB_WES_data/qcstep5/unrelated_0_0884/ukb_wes_chr${i}_sample_qc_final_unrelated \
+--keep /public/home/xyhe/project/wes/RESULTS/common_variants/fam_file/caucasian_fam_id.txt \
+--cojo-file ${path}/${Pheno}_comm_forCOJO.tsv \
+--cojo-slct --maf 0.01 \
+--cojo-p 1.19e-6 \
+--cojo-wind 10000 --cojo-collinear 0.9 \
+--extract ${path}/vv_sig_variants.txt \
+--chr ${i} \
+--out ${Pheno}_chr${i} \
+--thread-num 32
+done
